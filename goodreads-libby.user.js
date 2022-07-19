@@ -9,6 +9,7 @@
 // @icon					https://www.google.com/s2/favicons?sz=64&domain=libbyapp.com
 // @grant					GM.setValue
 // @grant					GM.getValue
+// @run-at              document-idle
 // @license				MIT
 // ==/UserScript==
 
@@ -65,13 +66,22 @@
       .firstChild.innerHTML.trim();
     let searchString = encodeURIComponent(`${bookTitle} ${bookAuthor}`);
     let libraries = JSON.parse(await GM.getValue("libraries", "[]"));
-    document.body.innerHTML += `<div style="position: fixed;
-						top: 100px;
-						left: 1em;
+    let closeSymbol = '\u274C';
+    document.body.innerHTML += `<div style="position: absolute;
+                        top: 100px;
+						right: 3em;
 						width: 400px;
 						background-color: #ececec;
 						border: 1px solid black;
-						padding: 1em;"><h3>Libby results</h3><div id="libby-results"></div></div>`;
+						padding-left: 1em;
+                        padding-right: 1em" id="grLibbyBox">
+                        <span style="float:right;
+                        padding:3px;" 
+                        id="dismissButton">${closeSymbol}
+                        </span>
+          <h3>Libby results</h3>
+          <div id="libby-results"></div>
+          </div>`;
 
     if (libraries.length === 0) {
       document.getElementById(
@@ -90,6 +100,12 @@
           ).innerHTML += `<div>${library._.name} <b><a href="https://libbyapp.com/search/${library.baseKey}/search/query-${searchString}/page-1" target="_blank">${result.totalItems} results</a></b></div>`;
         });
     });
+      var descTop = document.getElementById("description").getBoundingClientRect().y;
+      var descHeight = document.getElementById("description").getBoundingClientRect().height;
+      var theSum = descHeight + descTop;
+    document.getElementById(
+            "grLibbyBox"
+          ).style.top = `${theSum}px`;
   };
 
   if (unsafeWindow.location.host == "libbyapp.com") {
