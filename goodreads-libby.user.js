@@ -100,9 +100,8 @@
           ).innerHTML += `<div>${library._.name} <b><a href="https://libbyapp.com/search/${library.baseKey}/search/query-${searchString}/page-1" target="_blank">${result.totalItems} results</a></b></div>`;
         });
     });
-      var descTop = document.getElementById("description").getBoundingClientRect().y;
-      var descHeight = document.getElementById("description").getBoundingClientRect().height;
-      var theSum = descHeight + descTop;
+      var descTop = document.getElementById("AGtable").getBoundingClientRect().y;
+      var theSum = descTop;
     document.getElementById(
             "grLibbyBox"
           ).style.top = `${theSum}px`;
