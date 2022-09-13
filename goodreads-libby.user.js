@@ -60,26 +60,16 @@
   };
 
   const addGoodreadsResults = async () => {
-    let bookTitle = document.getElementById("bookTitle").innerHTML.trim();
+    let bookTitle = document.getElementById("bookTitle").innerText;
     let bookAuthor = document
       .getElementsByClassName("authorName")[0]
       .firstChild.innerHTML.trim();
     let searchString = encodeURIComponent(`${bookTitle} ${bookAuthor}`);
     let libraries = JSON.parse(await GM.getValue("libraries", "[]"));
-    let closeSymbol = '\u274C';
-    document.body.innerHTML += `<div style="position: absolute;
-                        top: 100px;
-						right: 3em;
-						width: 400px;
-						background-color: #ececec;
-						border: 1px solid black;
-						padding-left: 1em;
+    let previousBox = document.getElementById("descriptionContainer");
+    previousBox.innerHTML += `<div style="padding-left: 1em;
                         padding-right: 1em" id="grLibbyBox">
-                        <span style="float:right;
-                        padding:3px;" 
-                        id="dismissButton">${closeSymbol}
-                        </span>
-          <h3>Libby results</h3>
+                        <h2 class="buyButtonContainer__title u-inlineBlock">Libby results</h2>
           <div id="libby-results"></div>
           </div>`;
 
@@ -100,11 +90,6 @@
           ).innerHTML += `<div>${library._.name} <b><a href="https://libbyapp.com/search/${library.baseKey}/search/query-${searchString}/page-1" target="_blank">${result.totalItems} results</a></b></div>`;
         });
     });
-      var descTop = document.getElementById("AGtable").getBoundingClientRect().y;
-      var theSum = descTop;
-    document.getElementById(
-            "grLibbyBox"
-          ).style.top = `${theSum}px`;
   };
 
   if (unsafeWindow.location.host == "libbyapp.com") {
