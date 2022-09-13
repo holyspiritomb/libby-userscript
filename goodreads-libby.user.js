@@ -60,11 +60,13 @@
   };
 
   const addGoodreadsResults = async () => {
-    let bookTitle = document.getElementById("bookTitle").innerText;
+    let bookTitle = document.getElementById("bookTitle").innerHTML.trim();
     let bookAuthor = document
       .getElementsByClassName("authorName")[0]
       .firstChild.innerHTML.trim();
-    let searchString = encodeURIComponent(`${bookTitle} ${bookAuthor}`);
+    let searchTitle = bookTitle.replace(/\(.*\)/, "").replace(/^\s+|\s+$/g, '').replace(/[&|,]/g, ' ').replace(/: .*/, '').replace(/[ ]+/, ' ');
+    let searchString = encodeURIComponent(searchTitle) + "&creator=" + encodeURIComponent(bookAuthor);
+    console.log(searchString);
     let libraries = JSON.parse(await GM.getValue("libraries", "[]"));
     let previousBox = document.getElementById("descriptionContainer");
     previousBox.innerHTML += `<div style="padding-left: 1em;
@@ -85,9 +87,11 @@
       fetch(url)
         .then((response) => response.json())
         .then((result) => {
+          //let libraryResultURL = "http://" + library.baseKey +".overdrive.com/search/title?query=" + encodeURIComponent(bookTitle) + "&creator=" + encodeURIComponent(bookAuthor);
+          //console.log("url of book: ", libraryResultURL);
           document.getElementById(
             "libby-results"
-          ).innerHTML += `<div>${library._.name} <b><a href="https://libbyapp.com/search/${library.baseKey}/search/query-${searchString}/page-1" target="_blank">${result.totalItems} results</a></b></div>`;
+          ).innerHTML += `<div>${library._.name} <b><a href="http://${library.baseKey}.overdrive.com/search/title?query=${searchString}" target="_blank">${result.totalItems} results</a></b></div>`;
         });
     });
   };
