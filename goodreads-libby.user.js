@@ -9,7 +9,6 @@
 // @icon          https://www.google.com/s2/favicons?sz=64&domain=libbyapp.com
 // @grant         GM.setValue
 // @grant         GM.getValue
-// @grant         GM.setValue
 // @grant         unsafeWindow
 // @run-at        document-idle
 // @license       MIT
