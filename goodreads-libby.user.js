@@ -60,7 +60,7 @@
   };
 
   const addGoodreadsResults = async () => {
-    let bookTitle = document.getElementById("bookTitle").innerHTML.trim();
+    let bookTitle = document.querySelector("meta[property='og:title']").content;
     let bookAuthor = document
       .getElementsByClassName("authorName")[0]
       .firstChild.innerHTML.trim();
@@ -68,10 +68,15 @@
     let searchString = encodeURIComponent(searchTitle) + "&creator=" + encodeURIComponent(bookAuthor);
     console.log(searchString);
     let libraries = JSON.parse(await GM.getValue("libraries", "[]"));
-    let previousBox = document.getElementById("descriptionContainer");
+    var previousBox;
+    if (!!(document.querySelector("html.mobile"))){
+      previousBox = document.querySelector("[itemprop='description']");
+    } else {
+      previousBox = document.getElementById("descriptionContainer");
+    }
     previousBox.innerHTML += `<div id="grLibbyBox">
                         <h2 class="buyButtonContainer__title u-inlineBlock">Libby results</h2>
-          <div id="libby-results" style="margin-left:1em;max-height:300px!important;overflow-y:auto;"></div>
+          <div id="libby-results" style="margin-left:1em;"></div>
           </div>`;
 
     if (libraries.length === 0) {
