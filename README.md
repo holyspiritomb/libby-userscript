@@ -1,6 +1,6 @@
 # Goodreads Libby Userscript
 
-Userscript that will search for the book you are looking at on Goodreads across all your libby libraries.
+Userscript that will search for the book you are looking at on Goodreads across all your libby libraries. Forked from [Dylancyclone](https://github.com/Dylancyclone/goodreads-libby-userscript).
 
 ## Installation
 
@@ -12,9 +12,8 @@ Userscript that will search for the book you are looking at on Goodreads across 
 
 2. Install:
 
-    * Install the script directly from GitHub through this link: [Install](https://github.com/Dylancyclone/goodreads-libby-userscript/raw/main/goodreads-libby.user.js).
-    * Install the script from [GreasyFork](https://greasyfork.org/en/scripts/440958-goodreads-libby-results) (GF)
-<!-- * Or, install the scripts from [OpenUserJS](https://openuserjs.org/users/Dylancyclone/scripts) (OU). -->
+    * Install the script directly from GitHub through this link: [Install](https://github.com/holyspiritomb/goodreads-libby-userscript/raw/main/goodreads-libby.user.js).
+
 
 ## Usage
 
