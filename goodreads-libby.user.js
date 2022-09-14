@@ -69,10 +69,9 @@
     console.log(searchString);
     let libraries = JSON.parse(await GM.getValue("libraries", "[]"));
     let previousBox = document.getElementById("descriptionContainer");
-    previousBox.innerHTML += `<div style="padding-left: 1em;
-                        padding-right: 1em" id="grLibbyBox">
+    previousBox.innerHTML += `<div id="grLibbyBox">
                         <h2 class="buyButtonContainer__title u-inlineBlock">Libby results</h2>
-          <div id="libby-results"></div>
+          <div id="libby-results" style="margin-left:1em;max-height:300px!important;overflow-y:auto;"></div>
           </div>`;
 
     if (libraries.length === 0) {
@@ -87,11 +86,27 @@
       fetch(url)
         .then((response) => response.json())
         .then((result) => {
-          //let libraryResultURL = "http://" + library.baseKey +".overdrive.com/search/title?query=" + encodeURIComponent(bookTitle) + "&creator=" + encodeURIComponent(bookAuthor);
-          //console.log("url of book: ", libraryResultURL);
-          document.getElementById(
-            "libby-results"
-          ).innerHTML += `<div>${library._.name} <b><a href="http://${library.baseKey}.overdrive.com/search/title?query=${searchString}" target="_blank">${result.totalItems} results</a></b></div>`;
+          if (result.totalItems == 0){
+            //console.log(`no items at ${librarykey}`);
+          } else {
+            document.getElementById(
+              "libby-results"
+            ).innerHTML += `<div class="${library.baseKey}" id="libby-${library.baseKey}"></div>`
+            let resultItems = result.items;
+            resultItems.forEach(item => {
+              console.log(item);
+              var itemFormat = "";
+              if (item.type.id == "audiobook"){
+                itemFormat = '\uD83C\uDFA7'
+              }
+              if (item.type.id == "ebook"){
+                itemFormat = '\uD83D\uDCDA'
+              }
+              document.getElementById(
+                `libby-${library.baseKey}`
+              ).innerHTML += `<span><a href="http://${library.baseKey}.overdrive.com/search/title?query=${searchString}" title="${library.baseKey}: ${item.title} ${item.type.id}">${item.availableCopies}/${item.ownedCopies} ${itemFormat}</a></span>&nbsp;&nbsp;`;
+            });
+          }
         });
     });
   };
