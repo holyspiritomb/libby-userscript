@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name          Goodreads Libby Results (forked)
 // @namespace     https://github.com/holyspiritomb
-// @version       1.0.0
+// @version       1.0.1
 // @description   Searches for the book you are looking at on Goodreads across all your libby libraries. Forked from Dylancyclone's script.
 // @author        holyspiritomb
 // @match         https://libbyapp.com/interview/menu
@@ -77,7 +77,7 @@
     let libbyContainer = document.createElement("div");
     libbyContainer.id = "grLibbyBox";
     libbyContainer.innerHTML += `
-                        <h2 class="buyButtonContainer__title u-inlineBlock">Libby results</h2>
+                        <h2 class="buyButtonContainer__title u-inlineBlock brownBackground">Libby results</h2>
           <div id="libby-results" style="margin-left:1em;"></div>`;
     previousBox.insertAdjacentElement("afterend",libbyContainer);
 
