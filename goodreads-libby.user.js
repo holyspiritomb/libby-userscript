@@ -74,10 +74,12 @@
     } else {
       previousBox = document.getElementById("descriptionContainer");
     }
-    previousBox.innerHTML += `<div id="grLibbyBox">
+    let libbyContainer = document.createElement("div");
+    libbyContainer.id = "grLibbyBox";
+    libbyContainer.innerHTML += `
                         <h2 class="buyButtonContainer__title u-inlineBlock">Libby results</h2>
-          <div id="libby-results" style="margin-left:1em;"></div>
-          </div>`;
+          <div id="libby-results" style="margin-left:1em;"></div>`;
+    previousBox.insertAdjacentElement("afterend",libbyContainer);
 
     if (libraries.length === 0) {
       document.getElementById(
