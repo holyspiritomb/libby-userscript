@@ -4,6 +4,7 @@
 // @version       1.0.3
 // @description   Searches for the book you are looking at on Goodreads across all your libby libraries. Forked from Dylancyclone's script.
 // @author        holyspiritomb
+// @updateURL      https://raw.githubusercontent.com/holyspiritomb/goodreads-libby-userscript/main/goodreads-libby.user.js
 // @match         https://libbyapp.com/interview/menu
 // @include       /^https?://.*\.goodreads\.com/book/show.*$/
 // @icon          https://www.google.com/s2/favicons?sz=64&domain=libbyapp.com
