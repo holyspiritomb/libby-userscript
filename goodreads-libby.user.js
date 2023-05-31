@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name          Goodreads Libby Results (forked)
 // @namespace     https://github.com/holyspiritomb
-// @version       1.0.3
+// @version       1.0.4
 // @description   Searches for the book you are looking at on Goodreads across all your libby libraries. Forked from Dylancyclone's script.
 // @author        holyspiritomb
 // @updateURL      https://raw.githubusercontent.com/holyspiritomb/goodreads-libby-userscript/main/goodreads-libby.user.js
@@ -114,7 +114,8 @@
             resultsElement.style.flexDirection = "row";
             let resultsElementLink = document.createElement("a");
             resultsElementLink.id = `libby-forked-${library.baseKey}`;
-            resultsElementLink.href = `https://${library.baseKey}.overdrive.com/search/title?query=${searchString}`;
+            // resultsElementLink.href = `https://${library.baseKey}.overdrive.com/search/title?query=${searchString}`;
+            resultsElementLink.href = `https://libbyapp.com/search/${library.baseKey}/search/query-${searchString}/page-1`;
             resultsElement.appendChild(resultsElementLink);
             document.getElementById("libby-results-forked").appendChild(resultsElement);
             let resultItems = result.items;
