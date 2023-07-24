@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name          Goodreads Libby Results (forked)
 // @namespace     https://github.com/holyspiritomb
-// @version       1.0.4
+// @version       1.1.0
 // @description   Searches for the book you are looking at on Goodreads across all your libby libraries. Forked from Dylancyclone's script.
 // @author        holyspiritomb
 // @updateURL      https://raw.githubusercontent.com/holyspiritomb/goodreads-libby-userscript/main/goodreads-libby-adguard.user.js
@@ -21,12 +21,15 @@
 
   const syncLibraries = () => {
     // Grab libraries from libby and remove circular references
-    let libraries = unsafeWindow.APP.libraries.all.map((library) => {
+    // Use current cards instead of all libraries in history
+    let libraries = unsafeWindow.APP.patron.cards.all.map((card) => {
       return {
-        baseKey: library.baseKey,
-        _: { activeKey: library._.activeKey, name: library._.name },
+        baseKey: card.library.baseKey,
+        _: { activeKey: card.library._.activeKey, name: card.library._.name },
       };
     });
+    console.log("library sync button clicked");
+    console.log(libraries);
     libraries = JSON.stringify(libraries);
     GM.setValue("libraries", libraries);
   };
@@ -155,6 +158,7 @@
           }
         });
     });
+    // put something here in case of no resulrs
   };
 
   if (unsafeWindow.location.host == "libbyapp.com") {
