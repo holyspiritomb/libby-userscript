@@ -110,6 +110,18 @@
         .then((result) => {
           if (result.totalItems === 0){
             console.log(`none found at ${library.baseKey}`);
+            let noresultsElem = document.createElement('div');
+            noresultsElem.className=library.baseKey;
+            noresultsElem.style.paddingBottom="5px";
+            noresultsElem.style.display = "flex";
+            noresultsElem.style.flexDirection = "row";
+            let noresultsElementLink = document.createElement("a");
+            noresultsElementLink.id = `libby-forked-${library.baseKey}`;
+            noresultsElementLink.href = `https://libbyapp.com/search/${library.baseKey}/search/query-${searchString}/page-1`;
+            noresultsElementLink.style.color = "#555";
+            noresultsElementLink.innerText = "none found";
+            noresultsElem.appendChild(noresultsElementLink);
+            document.getElementById("libby-results-forked").appendChild(noresultsElem);
           } else {
             let resultsElement = document.createElement('div');
             resultsElement.className=library.baseKey;
