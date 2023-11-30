@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name          Goodreads Libby Results (forked)
 // @namespace     https://github.com/holyspiritomb
-// @version       1.1.2
+// @version       1.2.0
 // @description   Searches for the book you are looking at on Goodreads across all your libby libraries. Forked from Dylancyclone's script.
 // @author        holyspiritomb
 // @updateURL      https://raw.githubusercontent.com/holyspiritomb/goodreads-libby-userscript/main/goodreads-libby-adguard.user.js
@@ -66,17 +66,16 @@
   };
 
   const addGoodreadsResults = async () => {
-    let isRedesign = (document.querySelector("div#__next"));
-	  let bookTitle = isRedesign ? document.querySelector("[data-testid='bookTitle']").innerText : document.querySelector("meta[property='og:title']").content;
-	  let bookAuthor = isRedesign ? document.querySelector("[aria-label^='By: ']").innerText : document.querySelector(".authorName").innerText;
-    if (bookAuthor == null) {
-      bookAuthor = document.querySelector("span.ContributorLink__name").innerText;
-    }
+    let bookTitle = document.querySelector("[data-testid='bookTitle']").innerText;
+    let bookAuthor;
+    let findBookAuthorEl = () => document.querySelector("[aria-label^='By: ']") || document.querySelector("span.ContributorLink__name");
     let searchTitle = bookTitle.replace(/\(.*\)/, "").replace(/^\s+|\s+$/g, '').replace(/[&|,]/g, ' ').replace(/: .*/, '').replace(/[ ]+/, ' ');
     let searchString;
-    if (bookAuthor == null) {
+    let bookAuthorEl = findBookAuthorEl();
+    if (bookAuthorEl == null) {
       searchString = encodeURIComponent(searchTitle);
     } else {
+      bookAuthor = bookAuthorEl.innerText;
       searchString = encodeURIComponent(searchTitle) + "&creator=" + encodeURIComponent(bookAuthor);
     }
     //console.log(searchString);
