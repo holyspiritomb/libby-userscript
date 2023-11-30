@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name          Goodreads Libby Results (forked)
 // @namespace     https://github.com/holyspiritomb
-// @version       1.2.0
+// @version       1.2.1
 // @description   Searches for the book you are looking at on Goodreads across all your libby libraries. Forked from Dylancyclone's script.
 // @author        holyspiritomb
 // @updateURL      https://raw.githubusercontent.com/holyspiritomb/goodreads-libby-userscript/main/goodreads-libby.user.js
@@ -87,8 +87,8 @@
     }
     let libbyContainer = document.createElement("div");
     libbyContainer.id = "grLibbyBoxforked";
-    let libbyResultsHeader = isRedesign ? document.createElement("h4") : document.createElement("h2");
-    libbyResultsHeader.className = isRedesign ? "Text__title4" : "buyButtonContainer__title";
+    let libbyResultsHeader = document.createElement("h4");
+    libbyResultsHeader.className = "Text__title4";
     libbyResultsHeader.innerHTML = "Libby Results";
     libbyContainer.appendChild(libbyResultsHeader);
     let libbyResultsContainer = document.createElement("div");
