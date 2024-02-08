@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name          Goodreads and Amazon Libby Results
 // @namespace     https://github.com/holyspiritomb
-// @version       1.3.0
+// @version       1.3.1
 // @description   Searches for the book you are looking at on Goodreads or Amazon across all your libby libraries. Forked from Dylancyclone's script.
 // @author        holyspiritomb
 // @updateURL      https://raw.githubusercontent.com/holyspiritomb/goodreads-libby-userscript/main/goodreads-libby.user.js
@@ -93,7 +93,7 @@
     let libraries = JSON.parse(await GM.getValue("libraries", "[]"));
     var previousBox;
     if (unsafeWindow.location.host == "www.amazon.com") {
-      let findPreviousBox = () => document.getElementById("shopAllFormats_feature_div") || document.getElementById("bookDescription_feature_div");
+      let findPreviousBox = () => document.getElementById("shopAllFormats_feature_div") || document.getElementById("bookDescription_feature_div") || document.getElementById("followTheAuthor_feature_div");
 	  previousBox = findPreviousBox();
     } else if (unsafeWindow.location.host == "www.goodreads.com") {
       previousBox = document.querySelector(".BookDetails");
