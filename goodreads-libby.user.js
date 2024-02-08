@@ -1,12 +1,13 @@
 // ==UserScript==
-// @name          Goodreads Libby Results (forked)
+// @name          Goodreads and Amazon Libby Results
 // @namespace     https://github.com/holyspiritomb
-// @version       1.2.1
-// @description   Searches for the book you are looking at on Goodreads across all your libby libraries. Forked from Dylancyclone's script.
+// @version       1.3.0
+// @description   Searches for the book you are looking at on Goodreads or Amazon across all your libby libraries. Forked from Dylancyclone's script.
 // @author        holyspiritomb
 // @updateURL      https://raw.githubusercontent.com/holyspiritomb/goodreads-libby-userscript/main/goodreads-libby.user.js
 // @match         https://libbyapp.com/interview/menu
 // @include       /^https?://.*\.goodreads\.com/book/show.*$/
+// @include       *://*.amazon.tld/*
 // @icon          https://www.google.com/s2/favicons?sz=64&domain=libbyapp.com
 // @grant         GM.setValue
 // @grant         GM.getValue
@@ -65,42 +66,70 @@
   };
 
   const addGoodreadsResults = async () => {
-    let bookTitle = document.querySelector("[data-testid='bookTitle']").innerText;
-    let bookAuthor;
-    let findBookAuthorEl = () => document.querySelector("[aria-label^='By: ']") || document.querySelector("span.ContributorLink__name");
+    // let bookTitle;
+    let bookTitleEl;
+    // let bookAuthor;
+    let bookAuthorEl;
+    if (unsafeWindow.location.host == "www.amazon.com") {
+      let findAmTitleEl = () => document.querySelector("span#ebooksTitle") || document.querySelector("span#productTitle");
+      bookTitleEl = findAmTitleEl();
+      let findBookAuthorEl = () => document.querySelector("div#bylineInfo > span.author > a") || document.querySelector("div#bylineInfo > a#bylineContributor");
+      bookAuthorEl = findBookAuthorEl();
+    } else if (unsafeWindow.location.host == "www.goodreads.com") {
+      bookTitleEl = document.querySelector("[data-testid='bookTitle']");
+      let findBookAuthorEl = () => document.querySelector("[aria-label^='By: ']") || document.querySelector("span.ContributorLink__name");
+      bookAuthorEl = findBookAuthorEl();
+    }
+    let bookTitle = bookTitleEl.innerText;
     let searchTitle = bookTitle.replace(/\(.*\)/, "").replace(/^\s+|\s+$/g, '').replace(/[&|,]/g, ' ').replace(/: .*/, '').replace(/[ ]+/, ' ');
     let searchString;
-    let bookAuthorEl = findBookAuthorEl();
     if (bookAuthorEl == null) {
       searchString = encodeURIComponent(searchTitle);
     } else {
-      bookAuthor = bookAuthorEl.innerText;
+      let bookAuthor = bookAuthorEl.innerText;
       searchString = encodeURIComponent(searchTitle) + "&creator=" + encodeURIComponent(bookAuthor);
     }
     //console.log(searchString);
     let libraries = JSON.parse(await GM.getValue("libraries", "[]"));
     var previousBox;
-    previousBox = document.querySelector(".BookDetails");
-    if (previousBox == null) {
-      let findPreviousBox = () => document.querySelector("[itemprop='description']") || document.getElementById("descriptionContainer");
-		  previousBox = findPreviousBox();
+    if (unsafeWindow.location.host == "www.amazon.com") {
+      let findPreviousBox = () => document.getElementById("shopAllFormats_feature_div") || document.getElementById("bookDescription_feature_div");
+	  previousBox = findPreviousBox();
+    } else if (unsafeWindow.location.host == "www.goodreads.com") {
+      previousBox = document.querySelector(".BookDetails");
+      if (previousBox == null) {
+        let findPreviousBox = () => document.querySelector("[itemprop='description']") || document.getElementById("descriptionContainer");
+	    previousBox = findPreviousBox();
+      }
     }
     let libbyContainer = document.createElement("div");
     libbyContainer.id = "grLibbyBoxforked";
-    let libbyResultsHeader = document.createElement("h4");
-    libbyResultsHeader.className = "Text__title4";
+    let libbyResultsHeader;
+    if (unsafeWindow.location.host == "www.amazon.com") {
+      libbyResultsHeader = document.createElement("h3");
+      libbyResultsHeader.className = "rpi-header a-spacing-small";
+    } else if (unsafeWindow.location.host == "www.goodreads.com") {
+      libbyResultsHeader = document.createElement("h4");
+      libbyResultsHeader.className = "Text__title4";
+    }
     libbyResultsHeader.innerHTML = "Libby Results";
     libbyContainer.appendChild(libbyResultsHeader);
     let libbyResultsContainer = document.createElement("div");
     libbyResultsContainer.id = "libby-results-forked";
-    libbyResultsContainer.style.marginLeft = "1em";
-    libbyResultsContainer.style.padding = "5px";
+    if (unsafeWindow.location.host == "www.goodreads.com") {
+      libbyResultsContainer.style.marginLeft = "1em";
+      libbyResultsContainer.style.overflowY = "auto";
+      libbyResultsContainer.style.maxHeight = "30vh";
+      libbyResultsContainer.style.padding = "5px";
+    }
     libbyResultsContainer.style.display = "flex";
     libbyResultsContainer.style.flexDirection = "column";
-    libbyResultsContainer.style.overflowY = "auto";
-    libbyResultsContainer.style.maxHeight = "30vh";
     libbyContainer.appendChild(libbyResultsContainer);
-    previousBox.insertAdjacentElement("afterend", libbyContainer);
+    if (unsafeWindow.location.host == "www.amazon.com") {
+      previousBox.insertAdjacentElement("beforebegin", libbyContainer);
+    } else if (unsafeWindow.location.host == "www.goodreads.com") {
+      previousBox.insertAdjacentElement("afterend", libbyContainer);
+    }
 
     if (libraries.length === 0) {
       document.getElementById(
@@ -181,7 +210,7 @@
 
   if (unsafeWindow.location.host == "libbyapp.com") {
     addLibbyButton();
-  } else if (unsafeWindow.location.host == "www.goodreads.com") {
+  } else if ((unsafeWindow.location.host == "www.goodreads.com") || (unsafeWindow.location.host == "www.amazon.com")) {
     GM_addStyle(`#libby-results-forked > div::before {
       content: attr(class) ': ';
       font-weight: bold;
