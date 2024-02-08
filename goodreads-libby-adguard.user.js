@@ -1,10 +1,10 @@
 // ==UserScript==
 // @name          Goodreads and Amazon Libby Results
 // @namespace     https://github.com/holyspiritomb
-// @version       1.3.1
-// @description   Searches for the book you are looking at on Goodreads or Amazon across all your libby libraries. Forked from Dylancyclone's script.
+// @version       1.3.2
+// @description   Searches for the book you are looking at on Goodreads or Amazon across all your libby libraries with cards. Originally forked from Dylancyclone's Goodreads Libby Results script.
 // @author        holyspiritomb
-// @updateURL      https://raw.githubusercontent.com/holyspiritomb/goodreads-libby-userscript/main/goodreads-libby-adguard.user.js
+// @updateURL     https://raw.githubusercontent.com/holyspiritomb/libby-userscript/main/goodreads-libby-adguard.user.js
 // @match         https://libbyapp.com/interview/menu
 // @include       /^https?://.*\.goodreads\.com/book/show.*$/
 // @include       *://*.amazon.tld/*
