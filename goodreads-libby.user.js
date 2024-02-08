@@ -93,7 +93,7 @@
     let libraries = JSON.parse(await GM.getValue("libraries", "[]"));
     var previousBox;
     if (unsafeWindow.location.host == "www.amazon.com") {
-      let findPreviousBox = () => document.getElementById("shopAllFormats_feature_div") || document.getElementById("bookDescription_feature_div") || document.getElementById("followTheAuthor_feature_div");
+      let findPreviousBox = () => document.getElementById("shopAllFormats_feature_div") || document.getElementById("bookDescription_feature_div") || document.getElementById("tmmSwatches");
 	  previousBox = findPreviousBox();
     } else if (unsafeWindow.location.host == "www.goodreads.com") {
       previousBox = document.querySelector(".BookDetails");
@@ -104,6 +104,7 @@
     }
     let libbyContainer = document.createElement("div");
     libbyContainer.id = "grLibbyBoxforked";
+    libbyContainer.style.margin = "10px";
     let libbyResultsHeader;
     if (unsafeWindow.location.host == "www.amazon.com") {
       libbyResultsHeader = document.createElement("h3");
@@ -116,21 +117,22 @@
     libbyContainer.appendChild(libbyResultsHeader);
     let libbyResultsContainer = document.createElement("div");
     libbyResultsContainer.id = "libby-results-forked";
+    libbyResultsContainer.style.padding = "5px";
     if (unsafeWindow.location.host == "www.goodreads.com") {
       libbyResultsContainer.style.marginLeft = "1em";
       libbyResultsContainer.style.overflowY = "auto";
       libbyResultsContainer.style.maxHeight = "30vh";
-      libbyResultsContainer.style.padding = "5px";
     }
     libbyResultsContainer.style.display = "flex";
     libbyResultsContainer.style.flexDirection = "column";
     libbyContainer.appendChild(libbyResultsContainer);
     if (unsafeWindow.location.host == "www.amazon.com") {
       previousBox.insertAdjacentElement("beforebegin", libbyContainer);
+      let hr = document.createElement("hr");
+      previousBox.insertAdjacentElement("beforebegin", hr);
     } else if (unsafeWindow.location.host == "www.goodreads.com") {
       previousBox.insertAdjacentElement("afterend", libbyContainer);
     }
-
     if (libraries.length === 0) {
       document.getElementById(
         "libby-results-forked"
@@ -213,8 +215,7 @@
   } else if ((unsafeWindow.location.host == "www.goodreads.com") || (unsafeWindow.location.host == "www.amazon.com")) {
     GM_addStyle(`#libby-results-forked > div::before {
       content: attr(class) ': ';
-      font-weight: bold;
-      flex-basis: 6.5em;
+      flex-basis: 7.5em;
       line-height: inherit;
       }
       #libby-results-forked {
