@@ -1,6 +1,6 @@
 # Goodreads Libby Userscript
 
-Userscript that will search for the book you are looking at on Goodreads across all your libby libraries. Forked from [Dylancyclone](https://github.com/Dylancyclone/goodreads-libby-userscript).
+Userscript that will search for the book you are looking at on Goodreads and Amazon across all your Libby libraries with cards. Forked from [Dylancyclone](https://github.com/Dylancyclone/goodreads-libby-userscript).
 
 ## Installation
 
@@ -12,16 +12,16 @@ Userscript that will search for the book you are looking at on Goodreads across 
 
 2. Install:
 
-    * Install the script directly from GitHub through this link: [Install](https://github.com/holyspiritomb/goodreads-libby-userscript/raw/main/goodreads-libby.user.js).
+    * Install the script directly from GitHub through one of these links: [Install](https://github.com/holyspiritomb/libby-userscript/raw/main/goodreads-libby.user.js) | [Install via Adguard for Android](https://github.com/holyspiritomb/libby-userscript/raw/main/goodreads-libby-adguard.user.js)
 
 
 ## Usage
 
-Go to the libby web app's main menu (https://libbyapp.com/interview/menu) and click the "Save Libraries" button.
+Go to the [Libby webapp's main menu](https://libbyapp.com/interview/menu) and click the "Save Libraries" button.
 
 ![The Save Libraries button](./libby.png)
 
-Then, search for a book on Goodreads. When you've found a book, the userscript will search across all your libby libraries and show the results on the left side of the screen.
+Then, search for a book on Goodreads or Amazon. When you've found a book, the userscript will search across all your libby libraries and show the results.
 
 ![The search results on Goodreads](./goodreads.png)
 
