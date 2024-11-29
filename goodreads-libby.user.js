@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name          Goodreads and Amazon Libby Results
 // @namespace     https://github.com/holyspiritomb
-// @version       1.3.2
+// @version       2.0.0
 // @description   Searches for the book you are looking at on Goodreads or Amazon across all your libby libraries with cards. Originally forked from Dylancyclone's Goodreads Libby Results script.
 // @author        holyspiritomb
 // @updateURL     https://raw.githubusercontent.com/holyspiritomb/libby-userscript/main/goodreads-libby.user.js
@@ -82,14 +82,17 @@
     }
     let bookTitle = bookTitleEl.innerText;
     let searchTitle = bookTitle.replace(/\(.*\)/, "").replace(/^\s+|\s+$/g, '').replace(/[&|,]/g, ' ').replace(/: .*/, '').replace(/[ ]+/, ' ');
-    let searchString;
+    let apiSearchString;
+    let urlSearchString;
     if (bookAuthorEl == null) {
-      searchString = encodeURIComponent(searchTitle);
+      apiSearchString = encodeURIComponent(searchTitle);
+      urlSearchString = encodeURIComponent(searchTitle);
     } else {
       let bookAuthor = bookAuthorEl.innerText;
-      searchString = encodeURIComponent(searchTitle) + "&creator=" + encodeURIComponent(bookAuthor);
+      apiSearchString = encodeURIComponent(searchTitle) + "&creator=" + encodeURIComponent(bookAuthor);
+      urlSearchString = encodeURIComponent(searchTitle) + encodeURIComponent(" ") + encodeURIComponent(bookAuthor);
     }
-    //console.log(searchString);
+    //console.log(apiSearchString);
     let libraries = JSON.parse(await GM.getValue("libraries", "[]"));
     var previousBox;
     if (unsafeWindow.location.host == "www.amazon.com") {
@@ -141,7 +144,7 @@
 
     libraries.map((library) => {
       let libraryKey = library._.activeKey || library.baseKey;
-      let url = `https://thunder.api.overdrive.com/v2/libraries/${libraryKey}/media?query=${searchString}`;
+      let url = `https://thunder.api.overdrive.com/v2/libraries/${libraryKey}/media?query=${apiSearchString}`;
       fetch(url)
         .then((response) => response.json())
         .then((result) => {
@@ -154,7 +157,7 @@
             noresultsElem.style.flexDirection = "row";
             let noresultsElementLink = document.createElement("a");
             noresultsElementLink.id = `libby-forked-${library.baseKey}`;
-            noresultsElementLink.href = `https://libbyapp.com/search/${library.baseKey}/search/query-${searchString}/page-1`;
+            noresultsElementLink.href = `https://libbyapp.com/search/${library.baseKey}/search/query-${urlSearchString}/page-1`;
             noresultsElementLink.style.color = "#555";
             noresultsElementLink.innerText = "none found";
             noresultsElem.appendChild(noresultsElementLink);
@@ -167,8 +170,8 @@
             resultsElement.style.flexDirection = "row";
             let resultsElementLink = document.createElement("a");
             resultsElementLink.id = `libby-forked-${library.baseKey}`;
-            // resultsElementLink.href = `https://${library.baseKey}.overdrive.com/search/title?query=${searchString}`;
-            resultsElementLink.href = `https://libbyapp.com/search/${library.baseKey}/search/query-${searchString}/page-1`;
+            // resultsElementLink.href = `https://${library.baseKey}.overdrive.com/search/title?query=${apiSearchString}`;
+            resultsElementLink.href = `https://libbyapp.com/search/${library.baseKey}/search/query-${urlSearchString}/page-1`;
             resultsElement.appendChild(resultsElementLink);
             document.getElementById("libby-results-forked").appendChild(resultsElement);
             let resultItems = result.items;
