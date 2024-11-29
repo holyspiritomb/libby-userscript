@@ -4,7 +4,7 @@
 // @version       2.0.0
 // @description   Searches for the book you are looking at on Goodreads or Amazon across all your libby libraries with cards. Originally forked from Dylancyclone's Goodreads Libby Results script.
 // @author        holyspiritomb
-// @updateURL     https://raw.githubusercontent.com/holyspiritomb/libby-userscript/main/goodreads-libby.user.js
+// @updateURL     https://raw.githubusercontent.com/holyspiritomb/libby-userscript/main/libby-availability.user.js
 // @match         https://libbyapp.com/interview/menu
 // @include       /^https?://.*\.goodreads\.com/book/show.*$/
 // @include       *://*.amazon.tld/*
