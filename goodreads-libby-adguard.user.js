@@ -1,0 +1,1 @@
+libby-availability-adguard.user.js
