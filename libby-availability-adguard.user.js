@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name          Goodreads and Amazon Libby Results
 // @namespace     https://github.com/holyspiritomb
-// @version       2.0.1
+// @version       2.0.2
 // @description   Searches for the book you are looking at on Goodreads or Amazon across all your libby libraries with cards. Originally forked from Dylancyclone's Goodreads Libby Results script.
 // @author        holyspiritomb
 // @updateURL     https://raw.githubusercontent.com/holyspiritomb/libby-userscript/main/libby-availability-adguard.user.js
@@ -36,13 +36,13 @@
   };
 
   const createLibbyButton = () => {
-    let builderDiv = document.createElement("div");
+    let builderDiv = document.createElement("li");
     builderDiv.innerHTML = `
-					<div class="menu-library-buttons">
-						<button class="menu-library-buttons-add-library halo" role="button" type="button">
+					<li class="summary-list-action">
+						<button class="summary-list-action-add-library halo" role="button" type="button">
 								<span role="text" id="libby-script-forked">Save Libraries (userscript)</span>
 						</button>
-					</div>
+					</li>
 				`.trim();
     let libbySyncButton = builderDiv.firstChild;
     libbySyncButton.onclick = syncLibraries;
@@ -55,7 +55,8 @@
    * so keep retrying until the container is ready
    */
   const addLibbyButton = () => {
-    let container = document.getElementsByClassName("menu-library-buttons");
+    // let container = document.getElementsByClassName("menu-library-buttons");
+    let container = document.getElementsByClassName("summary-list-action-add-library");
     if (container && container[0]) {
       container[0].parentNode.insertBefore(
         createLibbyButton(),
