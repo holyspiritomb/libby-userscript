@@ -12,7 +12,7 @@ Userscript that will search for the book you are looking at on Goodreads and Ama
 
 2. Install:
 
-    * Install the script directly from GitHub through one of these links: [Install](https://github.com/holyspiritomb/libby-userscript/raw/main/goodreads-libby.user.js) | [Install via Adguard for Android](https://github.com/holyspiritomb/libby-userscript/raw/main/goodreads-libby-adguard.user.js)
+    * Install the script directly from GitHub through one of these links: [Install](https://github.com/holyspiritomb/libby-userscript/raw/main/libby-availability.user.js) | [Install via Adguard for Android](https://github.com/holyspiritomb/libby-userscript/raw/main/libby-availability-adguard.user.js)
 
 
 ## Usage
