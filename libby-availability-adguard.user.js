@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name          Goodreads and Amazon Libby Results
 // @namespace     https://github.com/holyspiritomb
-// @version       2.0.3
+// @version       2.0.4
 // @description   Searches for the book you are looking at on Goodreads or Amazon across all your libby libraries with cards. Originally forked from Dylancyclone's Goodreads Libby Results script.
 // @author        holyspiritomb
 // @updateURL     https://raw.githubusercontent.com/holyspiritomb/libby-userscript/main/libby-availability-adguard.user.js
@@ -82,14 +82,6 @@
       bookTitleEl = document.querySelector("[data-testid='bookTitle']");
       let findBookAuthorEl = () => document.querySelector("[aria-label^='By: ']") || document.querySelector("span.ContributorLink__name");
       bookAuthorEl = findBookAuthorEl();
-    } else if (unsafeWindow.location.host == "www.plutobooks.com") {
-      bookTitleEl = document.querySelector("h1.pp-book__title");
-      let authors = "";
-      for (const auth of document.querySelectorAll("p.pp-book__author > a")){
-        authors = authors + `${auth.text} `
-      }
-      authors.trim();
-      bookAuthorStr = authors;
     }
     let bookTitle = bookTitleEl.innerText;
     let searchTitle = bookTitle.replace(/\(.*\)/, "").replace(/^\s+|\s+$/g, '').replace(/[&|,]/g, ' ').replace(/: .*/, '').replace(/[ ]+/, ' ');
