@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name          Goodreads and Amazon Libby Results
 // @namespace     https://github.com/holyspiritomb
-// @version       2.0.2
+// @version       2.0.3
 // @description   Searches for the book you are looking at on Goodreads or Amazon across all your libby libraries with cards. Originally forked from Dylancyclone's Goodreads Libby Results script.
 // @author        holyspiritomb
 // @updateURL     https://raw.githubusercontent.com/holyspiritomb/libby-userscript/main/libby-availability.user.js
@@ -57,9 +57,9 @@
     // let container = document.getElementsByClassName("menu-library-buttons");
     let container = document.getElementsByClassName("summary-list-action-add-library");
     if (container && container[0]) {
-      container[0].parentNode.insertBefore(
+      container[0].parentNode.parentNode.insertBefore(
         createLibbyButton(),
-        container[0].nextSibling
+        container[0].parentNode.nextSibling
       );
     } else {
       setTimeout(addLibbyButton, 10);
@@ -71,6 +71,7 @@
     let bookTitleEl;
     // let bookAuthor;
     let bookAuthorEl;
+    let bookAuthorStr;
     if (unsafeWindow.location.host == "www.amazon.com") {
       let findAmTitleEl = () => document.querySelector("span#ebooksTitle") || document.querySelector("span#productTitle");
       bookTitleEl = findAmTitleEl();
@@ -80,14 +81,27 @@
       bookTitleEl = document.querySelector("[data-testid='bookTitle']");
       let findBookAuthorEl = () => document.querySelector("[aria-label^='By: ']") || document.querySelector("span.ContributorLink__name");
       bookAuthorEl = findBookAuthorEl();
+    } else if (unsafeWindow.location.host == "www.plutobooks.com") {
+      bookTitleEl = document.querySelector("h1.pp-book__title");
+      let authors = "";
+      for (const auth of document.querySelectorAll("p.pp-book__author > a")){
+        authors = authors + `${auth.text} `
+      }
+      authors.trim();
+      bookAuthorStr = authors;
     }
     let bookTitle = bookTitleEl.innerText;
     let searchTitle = bookTitle.replace(/\(.*\)/, "").replace(/^\s+|\s+$/g, '').replace(/[&|,]/g, ' ').replace(/: .*/, '').replace(/[ ]+/, ' ');
     let apiSearchString;
     let urlSearchString;
     if (bookAuthorEl == null) {
+      if (bookAuthorStr != undefined) {
+      apiSearchString = encodeURIComponent(searchTitle) + "&creator=" + encodeURIComponent(bookAuthorStr);
+      urlSearchString = encodeURIComponent(searchTitle) + encodeURIComponent(" ") + encodeURIComponent(bookAuthorStr);
+      } else {
       apiSearchString = encodeURIComponent(searchTitle);
       urlSearchString = encodeURIComponent(searchTitle);
+      }
     } else {
       let bookAuthor = bookAuthorEl.innerText;
       apiSearchString = encodeURIComponent(searchTitle) + "&creator=" + encodeURIComponent(bookAuthor);
