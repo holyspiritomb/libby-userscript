@@ -46,6 +46,23 @@
 
   const site = currentSite();
 
+  function findAnchor() {
+    let anchorEl;
+    if (site == "amazon") {
+      const findAmznBox = () => document.getElementById("shopAllFormats_feature_div") || document.getElementById("bookDescription_feature_div") || document.getElementById("tmmSwatches");
+      anchorEl = findAmznBox();
+    } else if (site == "gr") {
+      anchorEl = document.querySelector(".BookDetails");
+      if (anchorEl == null) {
+        let findGrBox = () => document.querySelector("[itemprop='description']") || document.getElementById("descriptionContainer");
+	      anchorEl = findGrBox();
+      }
+    } else {
+      return;
+    }
+    return anchorEl;
+  }
+
   function createResultsDiv() {
     const libbyContainer = document.createElement("div");
     libbyContainer.id = "grLibbyBoxforked";
@@ -151,19 +168,8 @@
     }
     //console.log(apiSearchString);
     let libraries = JSON.parse(await GM.getValue("libraries", "[]"));
-    var previousBox;
-    if (unsafeWindow.location.host == "www.amazon.com") {
-      let findPreviousBox = () => document.getElementById("shopAllFormats_feature_div") || document.getElementById("bookDescription_feature_div") || document.getElementById("tmmSwatches");
-      previousBox = findPreviousBox();
-    } else if (unsafeWindow.location.host == "www.goodreads.com") {
-      previousBox = document.querySelector(".BookDetails");
-      if (previousBox == null) {
-        let findPreviousBox = () => document.querySelector("[itemprop='description']") || document.getElementById("descriptionContainer");
-	      previousBox = findPreviousBox();
-      }
-    }
     
-    insertContainer(createResultsDiv(), previousBox);
+    insertContainer(createResultsDiv(), findAnchor());
 
     if (libraries.length === 0) {
       document.getElementById(
