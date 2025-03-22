@@ -34,6 +34,38 @@
     GM.setValue("libraries", libraries);
   };
 
+  function createResultsDiv(site) {
+    const libbyContainer = document.createElement("div");
+    libbyContainer.id = "grLibbyBoxforked";
+    libbyContainer.style.margin = "10px";
+    let libbyResultsHeader;
+    if (site == "amazon") {
+      libbyResultsHeader = document.createElement("h3");
+      libbyResultsHeader.className = "rpi-header a-spacing-small";
+    } else if (site == "gr") {
+      libbyResultsHeader = document.createElement("h4");
+      libbyResultsHeader.className = "Text__title4";
+    }
+    libbyResultsHeader.innerHTML = "Libby Userscript Results";
+    libbyContainer.appendChild(libbyResultsHeader);
+    let libbyResultsContainer = document.createElement("div");
+    libbyResultsContainer.id = "libby-results-forked";
+    libbyResultsContainer.style.padding = "5px";
+    if (site == "gr") {
+      libbyResultsContainer.style.marginLeft = "1em";
+      libbyResultsContainer.style.overflowY = "auto";
+      libbyResultsContainer.style.maxHeight = "30vh";
+    }
+    libbyResultsContainer.style.display = "flex";
+    libbyResultsContainer.style.flexDirection = "column";
+    libbyContainer.appendChild(libbyResultsContainer);
+    return libbyContainer;
+  }
+
+  function insertContainer(el, prevContainer, position) {
+    prevContainer.insertAdjacentElement(position, el);
+  }
+
   const createLibbyButton = () => {
     let builderDiv = document.createElement("li");
     builderDiv.innerHTML = `
@@ -88,11 +120,11 @@
     let urlSearchString;
     if (bookAuthorEl == null) {
       if (bookAuthorStr != undefined) {
-      apiSearchString = encodeURIComponent(searchTitle) + "&creator=" + encodeURIComponent(bookAuthorStr);
-      urlSearchString = encodeURIComponent(searchTitle) + encodeURIComponent(" ") + encodeURIComponent(bookAuthorStr);
+        apiSearchString = encodeURIComponent(searchTitle) + "&creator=" + encodeURIComponent(bookAuthorStr);
+        urlSearchString = encodeURIComponent(searchTitle) + encodeURIComponent(" ") + encodeURIComponent(bookAuthorStr);
       } else {
-      apiSearchString = encodeURIComponent(searchTitle);
-      urlSearchString = encodeURIComponent(searchTitle);
+        apiSearchString = encodeURIComponent(searchTitle);
+        urlSearchString = encodeURIComponent(searchTitle);
       }
     } else {
       let bookAuthor = bookAuthorEl.innerText;
@@ -104,44 +136,21 @@
     var previousBox;
     if (unsafeWindow.location.host == "www.amazon.com") {
       let findPreviousBox = () => document.getElementById("shopAllFormats_feature_div") || document.getElementById("bookDescription_feature_div") || document.getElementById("tmmSwatches");
-	  previousBox = findPreviousBox();
+      previousBox = findPreviousBox();
     } else if (unsafeWindow.location.host == "www.goodreads.com") {
       previousBox = document.querySelector(".BookDetails");
       if (previousBox == null) {
         let findPreviousBox = () => document.querySelector("[itemprop='description']") || document.getElementById("descriptionContainer");
-	    previousBox = findPreviousBox();
+	      previousBox = findPreviousBox();
       }
     }
-    let libbyContainer = document.createElement("div");
-    libbyContainer.id = "grLibbyBoxforked";
-    libbyContainer.style.margin = "10px";
-    let libbyResultsHeader;
+
     if (unsafeWindow.location.host == "www.amazon.com") {
-      libbyResultsHeader = document.createElement("h3");
-      libbyResultsHeader.className = "rpi-header a-spacing-small";
-    } else if (unsafeWindow.location.host == "www.goodreads.com") {
-      libbyResultsHeader = document.createElement("h4");
-      libbyResultsHeader.className = "Text__title4";
-    }
-    libbyResultsHeader.innerHTML = "Libby Results";
-    libbyContainer.appendChild(libbyResultsHeader);
-    let libbyResultsContainer = document.createElement("div");
-    libbyResultsContainer.id = "libby-results-forked";
-    libbyResultsContainer.style.padding = "5px";
-    if (unsafeWindow.location.host == "www.goodreads.com") {
-      libbyResultsContainer.style.marginLeft = "1em";
-      libbyResultsContainer.style.overflowY = "auto";
-      libbyResultsContainer.style.maxHeight = "30vh";
-    }
-    libbyResultsContainer.style.display = "flex";
-    libbyResultsContainer.style.flexDirection = "column";
-    libbyContainer.appendChild(libbyResultsContainer);
-    if (unsafeWindow.location.host == "www.amazon.com") {
-      previousBox.insertAdjacentElement("beforebegin", libbyContainer);
+      insertContainer(createResultsDiv("amazon"), previousBox, "beforebegin");
       let hr = document.createElement("hr");
       previousBox.insertAdjacentElement("beforebegin", hr);
     } else if (unsafeWindow.location.host == "www.goodreads.com") {
-      previousBox.insertAdjacentElement("afterend", libbyContainer);
+      insertContainer(createResultsDiv("gr"), previousBox, "afterend");
     }
     if (libraries.length === 0) {
       document.getElementById(
