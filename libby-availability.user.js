@@ -34,7 +34,19 @@
     GM.setValue("libraries", libraries);
   };
 
-  function createResultsDiv(site) {
+  function currentSite() {
+    if (unsafeWindow.location.host == "www.amazon.com") {
+      return "amazon";
+    } else if (unsafeWindow.location.host == "www.goodreads.com") {
+      return "gr";
+    } else if (unsafeWindow.location.host == "libbyapp.com" ) {
+      return "libby";
+    }
+  }
+
+  const site = currentSite();
+
+  function createResultsDiv() {
     const libbyContainer = document.createElement("div");
     libbyContainer.id = "grLibbyBoxforked";
     libbyContainer.style.margin = "10px";
@@ -62,7 +74,13 @@
     return libbyContainer;
   }
 
-  function insertContainer(el, prevContainer, position) {
+  function insertContainer(el, prevContainer) {
+    var position;
+    if (site == "gr") {
+      position = "afterend"
+    } else if (site == "amazon") {
+      position = "beforebegin"
+    }
     prevContainer.insertAdjacentElement(position, el);
   }
 
@@ -144,14 +162,9 @@
 	      previousBox = findPreviousBox();
       }
     }
+    
+    insertContainer(createResultsDiv(), previousBox);
 
-    if (unsafeWindow.location.host == "www.amazon.com") {
-      insertContainer(createResultsDiv("amazon"), previousBox, "beforebegin");
-      let hr = document.createElement("hr");
-      previousBox.insertAdjacentElement("beforebegin", hr);
-    } else if (unsafeWindow.location.host == "www.goodreads.com") {
-      insertContainer(createResultsDiv("gr"), previousBox, "afterend");
-    }
     if (libraries.length === 0) {
       document.getElementById(
         "libby-results-forked"
