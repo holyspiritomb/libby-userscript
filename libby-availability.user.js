@@ -63,6 +63,34 @@
     return anchorEl;
   }
 
+  function sanitize(t) {
+    let sanitized = t.replace(/\(.*\)/, "").replace(/^\s+|\s+$/g, '').replace(/[&|,]/g, ' ').replace(/: .*/, '').replace(/[ ]+/, ' ');
+    return sanitized;
+  }
+
+  const getTitle = () => {
+    if (site == "amazon") {
+      let findAmTitleEl = () => document.querySelector("span#ebooksTitle") || document.querySelector("span#productTitle");
+      const bookTitleEl = findAmTitleEl();
+      return bookTitleEl.innerText;
+    } else if (site == "gr") {
+      const bookTitleEl = document.querySelector("[data-testid='bookTitle']");
+      return bookTitleEl.innerText;
+    }
+  }
+
+  const getAuthor = () => {
+    if (site == "amazon") {
+      let findAuthorEl = () => document.querySelector("div#bylineInfo > span.author > a") || document.querySelector("div#bylineInfo > a#bylineContributor");
+      const authorEl = findAuthorEl();
+      return authorEl.innerText;
+    } else if (site == "gr") {
+      const findAuthorEl = () => document.querySelector("[aria-label^='By: ']") || document.querySelector("span.ContributorLink__name");
+      const authorEl = findAuthorEl();
+      return authorEl.innerText;
+    }
+  }
+
   function createResultsDiv() {
     const libbyContainer = document.createElement("div");
     libbyContainer.id = "grLibbyBoxforked";
@@ -134,26 +162,13 @@
   };
 
   const addGoodreadsResults = async () => {
-    // let bookTitle;
-    let bookTitleEl;
-    // let bookAuthor;
-    let bookAuthorEl;
-    let bookAuthorStr;
-    if (unsafeWindow.location.host == "www.amazon.com") {
-      let findAmTitleEl = () => document.querySelector("span#ebooksTitle") || document.querySelector("span#productTitle");
-      bookTitleEl = findAmTitleEl();
-      let findBookAuthorEl = () => document.querySelector("div#bylineInfo > span.author > a") || document.querySelector("div#bylineInfo > a#bylineContributor");
-      bookAuthorEl = findBookAuthorEl();
-    } else if (unsafeWindow.location.host == "www.goodreads.com") {
-      bookTitleEl = document.querySelector("[data-testid='bookTitle']");
-      let findBookAuthorEl = () => document.querySelector("[aria-label^='By: ']") || document.querySelector("span.ContributorLink__name");
-      bookAuthorEl = findBookAuthorEl();
-    }
-    let bookTitle = bookTitleEl.innerText;
-    let searchTitle = bookTitle.replace(/\(.*\)/, "").replace(/^\s+|\s+$/g, '').replace(/[&|,]/g, ' ').replace(/: .*/, '').replace(/[ ]+/, ' ');
+    insertContainer(createResultsDiv(), findAnchor());
+    const bookAuthorStr = getAuthor();
+    const bookTitle = getTitle();
+
+    let searchTitle = sanitize(bookTitle);
     let apiSearchString;
     let urlSearchString;
-    if (bookAuthorEl == null) {
       if (bookAuthorStr != undefined) {
         apiSearchString = encodeURIComponent(searchTitle) + "&creator=" + encodeURIComponent(bookAuthorStr);
         urlSearchString = encodeURIComponent(searchTitle) + encodeURIComponent(" ") + encodeURIComponent(bookAuthorStr);
@@ -161,15 +176,9 @@
         apiSearchString = encodeURIComponent(searchTitle);
         urlSearchString = encodeURIComponent(searchTitle);
       }
-    } else {
-      let bookAuthor = bookAuthorEl.innerText;
-      apiSearchString = encodeURIComponent(searchTitle) + "&creator=" + encodeURIComponent(bookAuthor);
-      urlSearchString = encodeURIComponent(searchTitle) + encodeURIComponent(" ") + encodeURIComponent(bookAuthor);
-    }
     //console.log(apiSearchString);
     let libraries = JSON.parse(await GM.getValue("libraries", "[]"));
     
-    insertContainer(createResultsDiv(), findAnchor());
 
     if (libraries.length === 0) {
       document.getElementById(
