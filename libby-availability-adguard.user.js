@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name          Goodreads and Amazon Libby Results
 // @namespace     https://github.com/holyspiritomb
-// @version       2.0.4
+// @version       2.0.5
 // @description   Searches for the book you are looking at on Goodreads or Amazon across all your libby libraries with cards. Originally forked from Dylancyclone's Goodreads Libby Results script.
 // @author        holyspiritomb
 // @updateURL     https://raw.githubusercontent.com/holyspiritomb/libby-userscript/main/libby-availability-adguard.user.js
@@ -23,7 +23,7 @@
   const syncLibraries = () => {
     // Grab libraries from libby and remove circular references
     // Use current cards instead of all libraries in history
-    let libraries = unsafeWindow.APP.patron.cards.all.map((card) => {
+    const libraries = unsafeWindow.APP.patron.cards.all.map((card) => {
       return {
         baseKey: card.library.baseKey,
         _: { activeKey: card.library._.activeKey, name: card.library._.name },
@@ -31,8 +31,8 @@
     });
     console.log("library sync button clicked");
     console.log(libraries);
-    libraries = JSON.stringify(libraries);
-    GM.setValue("libraries", libraries);
+    const stringylibraries = JSON.stringify(libraries);
+    GM.setValue("libraries", stringylibraries);
   };
 
   function currentSite() {
@@ -69,13 +69,13 @@
     return searchString;
   }
 
-  function findAnchor() {
+  async function findAnchor() {
     let anchorEl;
     if (site == "amazon") {
-      const findAmznBox = () => document.getElementById("shopAllFormats_feature_div") || document.getElementById("bookDescription_feature_div") || document.getElementById("tmmSwatches");
-      anchorEl = findAmznBox();
+      const findAmznBox = async () => document.getElementById("shopAllFormats_feature_div") || document.getElementById("bookDescription_feature_div") || document.getElementById("tmmSwatches");
+      anchorEl = await findAmznBox();
     } else if (site == "gr") {
-      anchorEl = document.querySelector(".BookDetails");
+      anchorEl = document.querySelector(".BookPageMetadataSection__description");
       if (anchorEl == null) {
         let findGrBox = () => document.querySelector("[itemprop='description']") || document.getElementById("descriptionContainer");
 	      anchorEl = findGrBox();
@@ -91,9 +91,9 @@
     return sanitized;
   }
 
-  const getTitle = () => {
+  const getTitle = async () => {
     if (site == "amazon") {
-      let findAmTitleEl = () => document.querySelector("span#ebooksTitle") || document.querySelector("span#productTitle");
+      let findAmTitleEl = () => document.querySelector("#ebooksTitle") || document.querySelector("span#productTitle") || document.querySelector("#title");
       const bookTitleEl = findAmTitleEl();
       return bookTitleEl.innerText;
     } else if (site == "gr") {
@@ -102,11 +102,15 @@
     }
   }
 
-  const getAuthor = () => {
+  const getAuthor = async () => {
     if (site == "amazon") {
       let findAuthorEl = () => document.querySelector("div#bylineInfo > span.author > a") || document.querySelector("div#bylineInfo > a#bylineContributor");
       const authorEl = findAuthorEl();
-      return authorEl.innerText;
+      if (authorEl == null) {
+        return undefined;
+      } else {
+        return authorEl.innerText;
+      }
     } else if (site == "gr") {
       const findAuthorEl = () => document.querySelector("[aria-label^='By: ']") || document.querySelector("span.ContributorLink__name");
       const authorEl = findAuthorEl();
@@ -114,7 +118,7 @@
     }
   }
 
-  function createResultsDiv() {
+  async function createResultsDiv() {
     const libbyContainer = document.createElement("div");
     libbyContainer.id = "grLibbyBoxforked";
     libbyContainer.style.margin = "10px";
@@ -131,6 +135,8 @@
     let libbyResultsContainer = document.createElement("div");
     libbyResultsContainer.id = "libby-results-forked";
     libbyResultsContainer.style.padding = "5px";
+    libbyResultsContainer.style.lineHeight = "1.5em";
+    libbyResultsContainer.style.height = "auto";
     if (site == "gr") {
       libbyResultsContainer.style.marginLeft = "1em";
       libbyResultsContainer.style.overflowY = "auto";
@@ -185,9 +191,13 @@
   };
 
   const addGoodreadsResults = async () => {
-    insertContainer(createResultsDiv(), findAnchor());
-    const bookAuthorStr = getAuthor();
-    const bookTitle = getTitle();
+    const anchor = await findAnchor();
+    if (anchor && anchor != undefined) {
+      let libbyResults = await createResultsDiv();
+      insertContainer(libbyResults, anchor);
+    }
+    const bookAuthorStr = await getAuthor();
+    const bookTitle = await getTitle();
 
     let searchTitle = sanitize(bookTitle);
     let apiSearchString = getApiString(searchTitle, bookAuthorStr);
@@ -216,11 +226,14 @@
             noresultsElem.style.flexDirection = "row";
             let noresultsElementLink = document.createElement("a");
             noresultsElementLink.id = `libby-forked-${library.baseKey}`;
-            noresultsElementLink.href = `https://libbyapp.com/search/${library.baseKey}/search/query-${urlSearchString}/page-1`;
+            noresultsElementLink.href = `https://libbyapp.com/search/${libraryKey}/search/query-${urlSearchString}/page-1`;
             noresultsElementLink.style.color = "#555";
             noresultsElementLink.innerText = "none found";
             noresultsElem.appendChild(noresultsElementLink);
-            document.getElementById("libby-results-forked").appendChild(noresultsElem);
+            const libbyResults = () => document.getElementById("libby-results-forked");
+            const box = libbyResults();
+            box.appendChild(noresultsElem);
+            // document.getElementById("libby-results-forked").appendChild(noresultsElem);
           } else {
             let resultsElement = document.createElement('div');
             resultsElement.className=library.baseKey;
@@ -228,12 +241,16 @@
             resultsElement.style.display = "flex";
             resultsElement.style.flexDirection = "row";
             let resultsElementLink = document.createElement("div");
-            resultsElementLink.id = `libby-forked-${library.baseKey}`;
+            resultsElementLink.id = `libby-forked-${libraryKey}`;
             // resultsElementLink.href = `https://${library.baseKey}.overdrive.com/search/title?query=${apiSearchString}`;
             // resultsElementLink.href = `https://libbyapp.com/search/${library.baseKey}/search/query-${urlSearchString}/page-1`;
             resultsElement.appendChild(resultsElementLink);
             
-            document.getElementById("libby-results-forked").appendChild(resultsElement);
+            // document.getElementById("libby-results-forked").appendChild(resultsElement);
+            const libbyResults= () => document.getElementById("libby-results-forked");
+            const box = libbyResults();
+            box.appendChild(resultsElement);
+
             let resultItems = result.items;
             resultItems.forEach(item => {
               console.log(item);
@@ -260,13 +277,13 @@
 				      }
               let resultElem = document.createElement('a');
               resultElem.className = "result";
-              resultElem.href = `https://libbyapp.com/search/${library.baseKey}/search/query-${urlSearchString}/page-1/${item.id}`;
+              resultElem.href = `https://libbyapp.com/search/${libraryKey}/search/query-${urlSearchString}/page-1/${item.id}`;
               resultElem.style.display = "block";
-              resultElem.title = `${library.baseKey}: ${item.title} by ${item.creators[0].name} ${itemFormat}`;
+              resultElem.title = `${libraryKey}: ${item.title} by ${item.creators[0].name} ${itemFormat}`;
               resultElem.style.color = linkColor;
               resultElem.innerHTML = bookLinkText;
               document.getElementById(
-                `libby-forked-${library.baseKey}`
+                `libby-forked-${libraryKey}`
               ).appendChild(resultElem);
             });
           }
@@ -282,10 +299,6 @@
       content: attr(class) ': ';
       flex-basis: 7.5em;
       line-height: inherit;
-      }
-      #libby-results-forked {
-        line-height: 1.5em;
-        height:auto;
       }
       #libby-results-forked > div,
       #libby-results-forked > div > a,
