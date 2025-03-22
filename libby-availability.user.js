@@ -46,6 +46,28 @@
 
   const site = currentSite();
 
+  function getApiString(title, author) {
+    let searchString;
+    if (author != undefined) {
+      searchString = encodeURIComponent(title) + "&creator=" + encodeURIComponent(author);
+      // return searchString;
+    } else {
+      searchString = encodeURIComponent(title);
+    }
+    return searchString;
+  }
+
+  function getUrlString(title, author) {
+    let searchString;
+    if (author != undefined) {
+      searchString = encodeURIComponent(title) + encodeURIComponent(" ") + encodeURIComponent(author);
+      // return searchString;
+    } else {
+      searchString = encodeURIComponent(title);
+    }
+    return searchString;
+  }
+
   function findAnchor() {
     let anchorEl;
     if (site == "amazon") {
@@ -167,19 +189,11 @@
     const bookTitle = getTitle();
 
     let searchTitle = sanitize(bookTitle);
-    let apiSearchString;
-    let urlSearchString;
-      if (bookAuthorStr != undefined) {
-        apiSearchString = encodeURIComponent(searchTitle) + "&creator=" + encodeURIComponent(bookAuthorStr);
-        urlSearchString = encodeURIComponent(searchTitle) + encodeURIComponent(" ") + encodeURIComponent(bookAuthorStr);
-      } else {
-        apiSearchString = encodeURIComponent(searchTitle);
-        urlSearchString = encodeURIComponent(searchTitle);
-      }
-    //console.log(apiSearchString);
+    let apiSearchString = getApiString(searchTitle, bookAuthorStr);
+    let urlSearchString = getUrlString(searchTitle, bookAuthorStr);
+
     let libraries = JSON.parse(await GM.getValue("libraries", "[]"));
     
-
     if (libraries.length === 0) {
       document.getElementById(
         "libby-results-forked"
@@ -212,11 +226,12 @@
             resultsElement.style.paddingBottom="5px";
             resultsElement.style.display = "flex";
             resultsElement.style.flexDirection = "row";
-            let resultsElementLink = document.createElement("a");
+            let resultsElementLink = document.createElement("div");
             resultsElementLink.id = `libby-forked-${library.baseKey}`;
             // resultsElementLink.href = `https://${library.baseKey}.overdrive.com/search/title?query=${apiSearchString}`;
-            resultsElementLink.href = `https://libbyapp.com/search/${library.baseKey}/search/query-${urlSearchString}/page-1`;
+            // resultsElementLink.href = `https://libbyapp.com/search/${library.baseKey}/search/query-${urlSearchString}/page-1`;
             resultsElement.appendChild(resultsElementLink);
+            
             document.getElementById("libby-results-forked").appendChild(resultsElement);
             let resultItems = result.items;
             resultItems.forEach(item => {
@@ -242,8 +257,10 @@
 					      bookLinkText = "request"
                 linkColor = (document.querySelector("html[data-theme='light']")) ? "orange" : "#ffbe3d";
 				      }
-              let resultElem = document.createElement('div');
+              let resultElem = document.createElement('a');
               resultElem.className = "result";
+              resultElem.href = `https://libbyapp.com/search/${library.baseKey}/search/query-${urlSearchString}/page-1/${item.id}`;
+              resultElem.style.display = "block";
               resultElem.title = `${library.baseKey}: ${item.title} by ${item.creators[0].name} ${itemFormat}`;
               resultElem.style.color = linkColor;
               resultElem.innerHTML = bookLinkText;
@@ -267,6 +284,7 @@
       }
       #libby-results-forked {
         line-height: 1.5em;
+        height:auto;
       }
       #libby-results-forked > div,
       #libby-results-forked > div > a,
