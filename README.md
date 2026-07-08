@@ -1,5 +1,7 @@
 # Goodreads Libby Userscript
 
+[![Crafted by Human](https://madebyhuman.iamjarl.com/badges/crafted-black.svg)](https://madebyhuman.iamjarl.com)
+
 Userscript that will search for the book you are looking at on Goodreads and Amazon across all your Libby libraries with cards. Forked from [Dylancyclone](https://github.com/Dylancyclone/goodreads-libby-userscript).
 
 ## Installation
