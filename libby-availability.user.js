@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name          Goodreads and Amazon Libby Results
 // @namespace     https://github.com/holyspiritomb
-// @version       2.0.6
+// @version       2.0.7
 // @description   Searches for the book you are looking at on Goodreads or Amazon across all your libby libraries with cards. Originally forked from Dylancyclone's Goodreads Libby Results script.
 // @author        holyspiritomb
 // @updateURL     https://raw.githubusercontent.com/holyspiritomb/libby-userscript/main/libby-availability.user.js
@@ -189,7 +189,7 @@
     }
   };
 
-  const addGoodreadsResults = async () => {
+  const addLibbyResults = async () => {
     const anchor = await findAnchor();
     if (anchor && anchor != undefined) {
       let libbyResults = await createResultsDiv();
@@ -310,8 +310,9 @@
       #libby-results-forked > div > a:hover {
         text-decoration: underline;
       }`);
+    console.log("Adding results in 10 seconds...")
     setTimeout(() => {
-      addGoodreadsResults();
+      addLibbyResults();
     }, 10000);
   }
 })();
