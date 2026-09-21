@@ -1,21 +1,22 @@
 // ==UserScript==
 // @name         Goodreads and Amazon Libby Results
 // @namespace    https://github.com/holyspiritomb
-// @version      3.0.0
+// @version      3.1.0
 // @description  Searches for the book you are looking at on Goodreads or Amazon across all your libby libraries with cards. Originally forked from Dylancyclone's Goodreads Libby Results script.
 // @author       holyspiritomb
 // @updateURL    https://raw.githubusercontent.com/holyspiritomb/libby-userscript/main/libby-availability.user.js
 // @downloadURL  https://raw.githubusercontent.com/holyspiritomb/libby-userscript/main/libby-availability.user.js
 // @match        https://www.goodreads.com/book/show/*
-// @match        https://www.amazon.com/dp/B*
-// @match        https://www.amazon.com/gp/product/B*
+// @match        https://www.amazon.com/*
 // @icon         https://www.google.com/s2/favicons?sz=64&domain=libbyapp.com
 // @require      https://raw.githubusercontent.com/LoneBoco/GM_config/550b6fc909fdd825252b60e836d324054dde085c/gm_config.js
+// @resource     wincss https://unpkg.com/7.css/dist/7.scoped.css
 // @grant        GM.setValue
 // @grant        GM_setValue
 // @grant        GM.getValue
 // @grant        GM_getValue
 // @grant        GM_addStyle
+// @grant        GM_getResourceText
 // @run-at       document-idle
 // @license      MIT
 // ==/UserScript==
@@ -23,15 +24,26 @@
 /* globals GM_config */
 (function () {
   "use strict";
+  const frame = document.createElement('dialog');
+  frame.className = "win7";
+  document.body.appendChild(frame);
+  const win_css = GM_getResourceText("wincss");
+  let wincss;
+  if (win_css.startsWith('"')) {
+    wincss = win_css.slice(0,-1);
+  } else {
+    wincss = win_css;
+  }
 
-  let gmc = new GM_config(
+  const gmc = new GM_config(
     {
-      // 'frame': frame,
+      'frame': frame,
       'id': 'MyConfig', // The id used for this instance of GM_config
       'title': 'Libby Userscript Settings', // Panel Title
       'fields': {
         'libraries': {
-          'label': 'libraries separated by commas', // Appears next to field
+          'label': 'libraries', // Appears next to field
+          'title': 'list of libraries separated by commas',
           'type': 'textarea',
           'default': 'queerliblib,fairfax'
         },
@@ -40,23 +52,21 @@
         'init': onInit,
         'save': function() {
           this.log(this.get('libraries'))
+          console.log(this)
         }
       },
-      'frameStyle': [
-        'bottom: 0; border: 1px solid #000; display: none; height: 250px;',
-        'left: 0; margin: 0; max-height: 50%; max-width: 75%; opacity: 0;',
-        'overflow: auto; padding: 0; position: fixed; right: auto; top: auto;',
-        'width: 300px; z-index: 9999; border-radius:5px;'
-      ].join(' '),
-      'css': "#MyConfig {background-color:ivory;,color:#000000} #MyConfig .config_header{font-size:1.2em; color: black} #MyConfig *{color:black, background-color:lightgray}",
+      'css': [
+        "#MyConfig .config_header{font-size:1.2em}",
+      ].join(" "),
     }
   );
 
   function onInit() {
   // initialization complete
   // value is now available
-    let libraryListInit = gmc.get('libraries');
+    const libraryListInit = gmc.get('libraries');
     console.log(libraryListInit)
+    console.log(gmc)
   }
 
 
@@ -100,8 +110,8 @@
     } else if (site == "gr") {
       anchorEl = document.querySelector(".BookPageMetadataSection__description");
       if (anchorEl == null) {
-        let findGrBox = () => document.querySelector("[itemprop='description']") || document.getElementById("descriptionContainer");
-	      anchorEl = findGrBox();
+        const findGrBox = () => document.querySelector("[itemprop='description']") || document.getElementById("descriptionContainer");
+        anchorEl = findGrBox();
       }
     } else {
       return;
@@ -110,13 +120,13 @@
   }
 
   function sanitize(t) {
-    let sanitized = t.replace(/\(.*\)/, "").replace(/^\s+|\s+$/g, '').replace(/[&|,]/g, ' ').replace(/: .*/, '').replace(/[ ]+/, ' ');
+    const sanitized = t.replace(/\(.*\)/, "").replace(/^\s+|\s+$/g, '').replace(/[&|,]/g, ' ').replace(/: .*/, '').replace(/[ ]+/, ' ');
     return sanitized;
   }
 
   const getTitle = async () => {
     if (site == "amazon") {
-      let findAmTitleEl = () => document.querySelector("#ebooksTitle") || document.querySelector("span#productTitle") || document.querySelector("#title");
+      const findAmTitleEl = () => document.querySelector("#ebooksTitle") || document.querySelector("span#productTitle") || document.querySelector("h1#title");
       const bookTitleEl = findAmTitleEl();
       return bookTitleEl.innerText;
     } else if (site == "gr") {
@@ -127,7 +137,7 @@
 
   const getAuthor = async () => {
     if (site == "amazon") {
-      let findAuthorEl = () => document.querySelector("div#bylineInfo > span.author > a") || document.querySelector("div#bylineInfo > a#bylineContributor");
+      const findAuthorEl = () => document.querySelector("div#bylineInfo > span.author > a") || document.querySelector("div#bylineInfo span#contributorLink");
       const authorEl = findAuthorEl();
       if (authorEl == null) {
         return undefined;
@@ -144,6 +154,7 @@
   async function createResultsDiv() {
     const libbyContainer = document.createElement("div");
     libbyContainer.id = "grLibbyBoxforked";
+    libbyContainer.className = "win7";
     libbyContainer.style.margin = "10px";
     let libbyResultsHeader;
     if (site == "amazon") {
@@ -151,11 +162,11 @@
       libbyResultsHeader.className = "rpi-header a-spacing-small";
     } else if (site == "gr") {
       libbyResultsHeader = document.createElement("h4");
-      libbyResultsHeader.className = "Text__title4";
+      libbyResultsHeader.className = "Text Text__title3";
     }
     libbyResultsHeader.innerHTML = "Libby Userscript Results";
     libbyContainer.appendChild(libbyResultsHeader);
-    let libbyResultsContainer = document.createElement("div");
+    const libbyResultsContainer = document.createElement("div");
     libbyResultsContainer.id = "libby-results-forked";
     libbyResultsContainer.style.padding = "5px";
     libbyResultsContainer.style.lineHeight = "1.5em";
@@ -168,9 +179,12 @@
     libbyResultsContainer.style.display = "flex";
     libbyResultsContainer.style.flexDirection = "column";
     libbyContainer.appendChild(libbyResultsContainer);
-    let button = document.createElement("span");
+    const button = document.createElement("span");
     button.id = "libbyUserscriptConfig";
-    button.innerText = "config";
+    button.innerText = "\uD83D\uDD27 Configure Libby Userscript";
+    button.role = "button";
+    button.title = "libby userscript configuration";
+    button.ariaLabel = "libby userscript configuration";
     button.addEventListener('click', function(){
       gmc.open()
     })
@@ -179,7 +193,7 @@
   }
 
   function insertContainer(el, prevContainer) {
-    var position;
+    let position;
     if (site == "gr") {
       position = "afterend"
     } else if (site == "amazon") {
@@ -191,15 +205,15 @@
   const addLibbyResults = async () => {
     const anchor = await findAnchor();
     if (anchor && anchor != undefined) {
-      let libbyResults = await createResultsDiv();
+      const libbyResults = await createResultsDiv();
       insertContainer(libbyResults, anchor);
     }
     const bookAuthorStr = await getAuthor();
     const bookTitle = await getTitle();
 
-    let searchTitle = sanitize(bookTitle);
-    let apiSearchString = getApiString(searchTitle, bookAuthorStr);
-    let urlSearchString = getUrlString(searchTitle, bookAuthorStr);
+    const searchTitle = sanitize(bookTitle);
+    const apiSearchString = getApiString(searchTitle, bookAuthorStr);
+    const urlSearchString = getUrlString(searchTitle, bookAuthorStr);
 
 
     const libraryList = gmc.get('libraries')
@@ -212,33 +226,34 @@
 
     libraries.map((library) => {
       library = library.trim()
-      let url = `https://thunder.api.overdrive.com/v2/libraries/${library}/media?query=${apiSearchString}`;
+      const url = `https://thunder.api.overdrive.com/v2/libraries/${library}/media?query=${apiSearchString}`;
       fetch(url)
         .then((response) => response.json())
         .then((result) => {
           if (result.totalItems === 0){
             console.log(`none found at ${library}`);
-            let noresultsElem = document.createElement('div');
+            const noresultsElem = document.createElement('div');
             noresultsElem.className=library;
             noresultsElem.style.paddingBottom="5px";
             noresultsElem.style.display = "flex";
             noresultsElem.style.flexDirection = "row";
-            let noresultsElementLink = document.createElement("a");
+            const noresultsElementLink = document.createElement("a");
             noresultsElementLink.id = `libby-forked-${library}`;
+            noresultsElementLink.classList.add("no-result");
             noresultsElementLink.href = `https://libbyapp.com/search/${library}/search/query-${urlSearchString}/page-1`;
-            noresultsElementLink.style.color = "#555";
             noresultsElementLink.innerText = "none found";
+            noresultsElementLink.ariaLabel = `no results found at ${library}`;
             noresultsElem.appendChild(noresultsElementLink);
             const libbyResults = () => document.getElementById("libby-results-forked");
             const box = libbyResults();
             box.appendChild(noresultsElem);
           } else {
-            let resultsElement = document.createElement('div');
+            const resultsElement = document.createElement('div');
             resultsElement.className=library;
             resultsElement.style.paddingBottom="5px";
             resultsElement.style.display = "flex";
             resultsElement.style.flexDirection = "row";
-            let resultsElementLink = document.createElement("div");
+            const resultsElementLink = document.createElement("div");
             resultsElementLink.id = `libby-forked-${library}`;
             resultsElement.appendChild(resultsElementLink);
             
@@ -247,36 +262,38 @@
             const box = libbyResults();
             box.appendChild(resultsElement);
 
-            let resultItems = result.items;
+            const resultItems = result.items;
             resultItems.forEach(item => {
               console.log(item);
-              var itemFormat = "";
+              let itemFormat = "";
               if (item.type.id === "audiobook"){
                 itemFormat = '\uD83C\uDFA7'
               }
               if (item.type.id === "ebook"){
                 itemFormat = '\uD83D\uDCDA'
               }
-              var bookLinkText;
-              var linkColor;
+              let bookLinkText;
+              // let linkColor;
+              const resultClasses = ["result"];
               if (item.ownedCopies != 0) {
                 if (item.availableCopies === 0) {
-						      bookLinkText = `${item.holdsCount}/${item.ownedCopies} holds ${itemFormat}`;
-                  linkColor = (document.querySelector("html[data-theme='light']")) ? "orange" : "#ffbe3d";
-					      } else {
-						      bookLinkText = `${item.availableCopies} available ${itemFormat}`;
-                  linkColor = (document.querySelector("html[data-theme='light']")) ? "limegreen" : "#6dff6d";
-					      }
-				      } else {
-					      bookLinkText = "request"
-                linkColor = (document.querySelector("html[data-theme='light']")) ? "orange" : "#ffbe3d";
-				      }
-              let resultElem = document.createElement('a');
-              resultElem.className = "result";
+                  resultClasses.push("hold");
+                  bookLinkText = `${item.holdsCount}/${item.ownedCopies} holds ${itemFormat}`;
+                } else {
+                  resultClasses.push("available");
+                  bookLinkText = `${item.availableCopies} available ${itemFormat}`;
+                }
+              } else {
+                resultClasses.push("request");
+                bookLinkText = "request";
+              }
+              const resultElem = document.createElement('a');
+              resultElem.classList.add(...resultClasses);
               resultElem.href = `https://libbyapp.com/search/${library}/search/query-${urlSearchString}/page-1/${item.id}`;
               resultElem.style.display = "block";
               resultElem.title = `${library}: ${item.title} by ${item.creators[0].name} ${itemFormat}`;
-              resultElem.style.color = linkColor;
+              resultElem.ariaLabel = `${library}: ${item.title} by ${item.creators[0].name} ${itemFormat}`;
+              // resultElem.style.color = linkColor;
               resultElem.innerHTML = bookLinkText;
               document.getElementById(
                 `libby-forked-${library}`
@@ -285,22 +302,33 @@
           }
         });
     });
-    // put something here in case of no resulrs
+    // put something here in case of no results
   };
 
   if ((unsafeWindow.location.host == "www.goodreads.com") || (unsafeWindow.location.host == "www.amazon.com")) {
+    GM_addStyle(wincss);
     GM_addStyle(`
+      @media screen and (width > 500px) {
+        #MyConfig[style] {
+          inset: 35% 10% !important;
+          height: 300px !important;
+          width: 400px !important;
+        }
+      }
+      @media screen and (width <= 500px) {
+        #MyConfig[style] {
+          inset: 20% 10% !important;
+          height: 220px !important;
+          overflow-y: scroll;
+          overflow-x: scroll;
+        }
+        #MyConfig_wrapper {
+          padding: 0.5em;
+        }
+      }
       #libbyUserscriptConfig {
-        border: 1px outset currentColor;
-        border-radius: 3px;
-        color: currentColor;
-        padding: 3px;
-        padding-left:5px;
-        padding-right:5px;
-        display: block;
-        margin-left:auto;
-        margin-right:auto;
-        text-align:center;
+        padding-top:0.5em;
+        padding-bottom:0.5em;
       }
       #libby-results-forked > div::before {
       content: attr(class) ': ';
@@ -315,16 +343,33 @@
       #libby-results-forked > div > a > div{
         line-height: inherit;
       }
-      #libby-results-forked > div > a{
-        text-decoration: none;
+      #libby-results-forked a.no-result,
+      #libby-results-forked a.result {
+        text-decoration: none !important;
       }
-      #libby-results-forked > div > a:hover {
-        text-decoration: underline;
+      #libby-results-forked a.no-result {
+        color: var(--color-text-subdued, #555) !important;
+      }
+      #libby-results-forked a.result.request,
+      #libby-results-forked a.result.hold {
+        color: var(--color-background-rating-star-base, #ff6e21) !important;
+      }
+      #libby-results-forked a.result.available {
+        color: limegreen !important;
+      }
+      html[data-theme="dark"] #libby-results-forked a.result.request,
+      html[data-theme="dark"] #libby-results-forked a.result.hold {
+        color: #ffbe3d !important;
+      }
+      html[data-theme="dark"] #libby-results-forked a.result.available {
+        color: #6dff6d !important;
+      }
+      #libby-results-forked a.result:hover {
+        text-decoration: underline !important;
       }`);
     console.log("Adding results in 10 seconds...")
     setTimeout(() => {
       addLibbyResults();
-      // gmc.open()
-    }, 5000);
+    }, 10000);
   }
 })();
