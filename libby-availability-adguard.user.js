@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Goodreads and Amazon Libby Results
 // @namespace    https://github.com/holyspiritomb
-// @version      3.1.0
+// @version      3.1.1
 // @description  Searches for the book you are looking at on Goodreads or Amazon across all your libby libraries with cards. Originally forked from Dylancyclone's Goodreads Libby Results script.
 // @author       holyspiritomb
 // @updateURL    https://raw.githubusercontent.com/holyspiritomb/libby-userscript/main/libby-availability-adguard.user.js
@@ -257,7 +257,7 @@
             const resultsElementLink = document.createElement("div");
             resultsElementLink.id = `libby-forked-${library}`;
             resultsElement.appendChild(resultsElementLink);
-            
+
             // document.getElementById("libby-results-forked").appendChild(resultsElement);
             const libbyResults = () => document.getElementById("libby-results-forked");
             const box = libbyResults();
@@ -327,9 +327,14 @@
           padding: 0.5em;
         }
       }
+      #MyConfig textarea {
+        color: #111 !important;
+        background-color: #fff !important;
+      }
       #libbyUserscriptConfig {
         padding-top:0.5em;
         padding-bottom:0.5em;
+        color: #111 !important;
       }
       #libby-results-forked > div::before {
       content: attr(class) ': ';

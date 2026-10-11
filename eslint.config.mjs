@@ -1,8 +1,8 @@
 import eslint from "@eslint/js";
 import globals from "globals";
 import { defineConfig, globalIgnores } from "eslint/config";
-import userscripts from "eslint-plugin-userscripts";
 import stylistic from "@stylistic/eslint-plugin";
+import greasemonkey from "eslint-plugin-greasemonkey";
 
 export default defineConfig([
   globalIgnores(["libby-availability-adguard.user.js"]),
@@ -26,12 +26,10 @@ export default defineConfig([
     files: ["eslint.config.mjs"],
   },
   {
-    name: "usescript files",
-    files: ["*.user.js"],
+    name: "main script",
+    files: ["libby-availability.user.js"],
     plugins: {
-      userscripts: {
-        rules: userscripts.rules,
-      },
+      greasemonkey,
     },
     languageOptions: {
       sourceType: "commonjs",
@@ -41,10 +39,13 @@ export default defineConfig([
       },
     },
     rules: {
-      ...userscripts.configs.recommended.rules,
-      "userscripts/compat-grant": 1,
-      "userscripts/better-use-match": 1,
+      ...greasemonkey.configs.violentmonkey.rules,
+      "greasemonkey/no-unused-grants": "off", // "unused" grants are required for GM_config
+      // "greasemonkey/meta-spacing": ["warn", { "spaces": 2 }],
+      "greasemonkey/meta-spacing": "off",
       "@stylistic/brace-style": [1, "1tbs", { "allowSingleLine": true }],
+      "@stylistic/keyword-spacing": [1],
+      "@stylistic/no-trailing-spaces": [1],
     },
     settings: {
       userscriptVersions: {
@@ -53,4 +54,18 @@ export default defineConfig([
       },
     },
   },
+  {
+    name: "adguard script",
+    files: ["libby-availability-adguard.user.js"],
+    languageOptions: {
+      sourceType: "commonjs",
+      globals: {
+        ...globals.browser,
+        ...globals.greasemonkey,
+      },
+    },
+    rules: {
+      ...greasemonkey.configs.recommended.rules,
+    },
+  }
 ]);
