@@ -45,7 +45,7 @@
           'label': 'libraries', // Appears next to field
           'title': 'list of libraries separated by commas',
           'type': 'textarea',
-          'default': 'queerliblib,fairfax'
+          'default': 'queerliblib, fairfax'
         },
       },
       'events': {
