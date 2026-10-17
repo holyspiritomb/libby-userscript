@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Goodreads and Amazon Libby Results
 // @namespace    https://github.com/holyspiritomb
-// @version      3.2.0
+// @version      3.3.0
 // @description  Searches for the book you are looking at on Goodreads or Amazon across all your libby libraries with cards. Originally forked from Dylancyclone's Goodreads Libby Results script.
 // @author       holyspiritomb
 // @updateURL    https://raw.githubusercontent.com/holyspiritomb/libby-userscript/main/libby-availability.user.js
@@ -56,10 +56,28 @@
         'save': function() {
           this.log(this.get('libraries'))
           console.log(this)
+        },
+        'open': function() {
+          document.querySelector("#MyConfig_wrapper").className = "window";
+          const titleBarText = document.createElement("div");
+          titleBarText.innerText = "Libby Userscript";
+          titleBarText.className = "title-bar-text";
+          document.querySelector("#MyConfig .config_header").classList.add("title-bar");
+          document.querySelector("#MyConfig .config_header").lastChild.remove();
+          document.querySelector("#MyConfig .config_header").appendChild(titleBarText);
+          document.querySelector("#MyConfig .section_header_holder").classList.add("window-body");
+          document.querySelector("#MyConfig .section_header_holder").classList.add("has-space");
+          const buttons = document.querySelector("#MyConfig_buttons_holder");
+          document.querySelector("#MyConfig .section_header_holder").appendChild(buttons);
         }
       },
       'css': [
-        "#MyConfig .config_header{font-size:1.2em}",
+        "#MyConfig .field_label { font-weight: bold; margin-right: 6px; }",
+        "#MyConfig .block { display: block; }",
+        "#MyConfig .indent40 { margin-left: 40%; }",
+        "#MyConfig .center { text-align: center; }",
+        "#MyConfig .saveclose_buttons { margin: 16px 10px 10px; padding: 2px 12px; }",
+        "#MyConfig .reset, #MyConfig .reset a, #MyConfig_buttons_holder { text-align: right; }"
       ].join(" "),
     }
   );
@@ -70,15 +88,16 @@
     const libraryListInit = gmc.get('libraries');
     console.log(libraryListInit)
     console.log(gmc)
+    gmc.css.basic = "";
   }
 
 
   function currentSite() {
-    if (unsafeWindow.location.host == "www.amazon.com") {
+    if (window.location.host == "www.amazon.com") {
       return "amazon";
-    } else if (unsafeWindow.location.host == "www.goodreads.com") {
+    } else if (window.location.host == "www.goodreads.com") {
       return "gr";
-    } else if (unsafeWindow.location.host == "bookshop.org") {
+    } else if (window.location.host == "bookshop.org") {
       return "bookshop";
     }
   }
@@ -194,7 +213,12 @@
     const libbyContainer = document.createElement("div");
     libbyContainer.id = "grLibbyBoxforked";
     libbyContainer.className = "win7";
-    libbyContainer.style.margin = "10px";
+    if (site == "bookshop") {
+      libbyContainer.style.minWidth = "350px";
+      libbyContainer.style.marginLeft = "0px";
+      libbyContainer.style.marginTop = "10px";
+      libbyContainer.style.marginBottom = "10px";
+    }
     let libbyResultsHeader;
     if (site == "amazon") {
       libbyResultsHeader = document.createElement("h3");
@@ -355,6 +379,26 @@
     });
   }
 
+  const debugCss = `
+  #grLibbyBoxforked {
+    outline: 3px double currentColor !important;
+  }
+  #grLibbyBoxforked > * {
+    outline: 2px dashed red;
+  }
+  #grLibbyBoxforked > * > * {
+    outline: 1px dotted orange;
+    padding: 2px;
+  }
+  #grLibbyBoxforked > * > * > * {
+    outline: 1px dotted limegreen;
+    padding: 2px;
+  }
+  #grLibbyBoxforked > * > * > * > *{
+    outline: 1px dotted blue;
+    padding: 2px;
+  }`
+
   GM_addStyle(wincss);
   GM_addStyle(`
     @media screen and (width > 500px) {
@@ -362,6 +406,7 @@
         inset: 35% 10% !important;
         height: 300px !important;
         width: 400px !important;
+        border: 0;
       }
     }
     @media screen and (width <= 500px) {
@@ -370,9 +415,8 @@
         height: 220px !important;
         overflow-y: scroll;
         overflow-x: scroll;
-      }
-      #MyConfig_wrapper {
-        padding: 0.5em;
+        background: transparent !important;
+        border: 0 !important;
       }
     }
     #MyConfig textarea {
@@ -421,8 +465,15 @@
     #libby-results-forked a.result:hover {
       text-decoration: underline !important;
     }`);
-  console.log("Adding results in 10 seconds...")
+
+  let TIMEOUT = 10000;
+
+  if (window.location.href.endsWith("debug=true")) {
+    GM_addStyle(debugCss);
+    TIMEOUT = 5000; // I am impatient when debugging
+  }
+  console.log(`Adding results in ${TIMEOUT/1000} seconds...`)
   setTimeout(() => {
     addLibbyResults();
-  }, 10000);
+  }, TIMEOUT);
 })();
