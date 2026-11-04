@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Goodreads and Amazon Libby Results
 // @namespace    https://github.com/holyspiritomb
-// @version      3.3.1
+// @version      3.3.2
 // @description  Searches for the book you are looking at on Goodreads or Amazon across all your libby libraries with cards. Originally forked from Dylancyclone's Goodreads Libby Results script.
 // @author       holyspiritomb
 // @updateURL    https://raw.githubusercontent.com/holyspiritomb/libby-userscript/main/libby-availability-adguard.user.js
@@ -75,11 +75,9 @@
         "#MyConfig .field_label { font-weight: bold; margin-right: 6px; }",
         "#MyConfig .block { display: block; }",
         "#MyConfig .indent40 { margin-left: 40%; }",
-        "#MyConfig .center { text-align: center; }",
         "#MyConfig .saveclose_buttons { margin: 16px 10px 10px; padding: 2px 12px; }",
         "#MyConfig .reset, #MyConfig .reset a, #MyConfig_buttons_holder { text-align: right; }"
       ].join(" "),
-      "frameStyle" : "border: 0; background: transparent;"
     }
   );
 
@@ -381,20 +379,25 @@
   }
 
   const debugCss = `
+  #MyConfig[style],
   #grLibbyBoxforked {
     outline: 3px double currentColor !important;
   }
+  #MyConfig[style] > *,
   #grLibbyBoxforked > * {
     outline: 2px dashed red;
   }
+  #MyConfig[style] > * > *,
   #grLibbyBoxforked > * > * {
     outline: 1px dotted orange;
     padding: 2px;
   }
+  #MyConfig[style] > * > * > *,
   #grLibbyBoxforked > * > * > * {
     outline: 1px dotted limegreen;
     padding: 2px;
   }
+  #MyConfig[style] > * > * > * > *,
   #grLibbyBoxforked > * > * > * > *{
     outline: 1px dotted blue;
     padding: 2px;
@@ -404,21 +407,24 @@
   GM_addStyle(`
     @media screen and (width > 500px) {
       #MyConfig[style] {
-        inset: 35% 10% !important;
-        height: 300px !important;
+        inset: calc(50% - 110px) calc(50% - 200px) !important;
         width: 400px !important;
-        border: 0;
       }
     }
     @media screen and (width <= 500px) {
       #MyConfig[style] {
-        inset: 20% 10% !important;
-        height: 220px !important;
+        inset: calc(50% - 110px) 10% !important;
         overflow-y: scroll;
         overflow-x: scroll;
-        background: transparent !important;
-        border: 0 !important;
       }
+    }
+    #MyConfig[style] {
+      background: transparent !important;
+      border: 0 !important;
+      height: 220px !important;
+      border-radius: 6px !important;
+      max-height: fit-content !important;
+      box-shadow: 2px 2px 10px 1px var(--w7-w-bd), inset 0 0 0 1px #fffa;
     }
     #MyConfig textarea {
       color: #111 !important;
