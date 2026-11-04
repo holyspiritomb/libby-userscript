@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Goodreads and Amazon Libby Results
 // @namespace    https://github.com/holyspiritomb
-// @version      3.3.0
+// @version      3.3.1
 // @description  Searches for the book you are looking at on Goodreads or Amazon across all your libby libraries with cards. Originally forked from Dylancyclone's Goodreads Libby Results script.
 // @author       holyspiritomb
 // @updateURL    https://raw.githubusercontent.com/holyspiritomb/libby-userscript/main/libby-availability-adguard.user.js
@@ -71,7 +71,7 @@
           document.querySelector("#MyConfig .section_header_holder").appendChild(buttons);
         }
       },
-      'css': [
+      "css": [
         "#MyConfig .field_label { font-weight: bold; margin-right: 6px; }",
         "#MyConfig .block { display: block; }",
         "#MyConfig .indent40 { margin-left: 40%; }",
@@ -79,16 +79,17 @@
         "#MyConfig .saveclose_buttons { margin: 16px 10px 10px; padding: 2px 12px; }",
         "#MyConfig .reset, #MyConfig .reset a, #MyConfig_buttons_holder { text-align: right; }"
       ].join(" "),
+      "frameStyle" : "border: 0; background: transparent;"
     }
   );
 
   function onInit() {
   // initialization complete
   // value is now available
+    gmc.css.basic = "";
     const libraryListInit = gmc.get('libraries');
     console.log(libraryListInit)
     console.log(gmc)
-    gmc.css.basic = "";
   }
 
 
